@@ -5,8 +5,11 @@ import at.dalex.addressbook.repository.model.Contact;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.stage.WindowEvent;
+
+import java.util.Iterator;
 
 public class ViewController implements EventHandler<WindowEvent> {
 
@@ -24,6 +27,9 @@ public class ViewController implements EventHandler<WindowEvent> {
     @FXML private Button button_delete;
     @FXML private Button button_save;
     @FXML private Button button_cancel;
+
+    //ListView
+    @FXML private ListView<String> list_contacts;
 
     private ContactCSVRepository csvRepository;
     private Contact shownContact;
@@ -63,6 +69,20 @@ public class ViewController implements EventHandler<WindowEvent> {
     }
 
     /**
+     * Updates the contact list according to the data contained
+     * in the repository.
+     */
+    private void updateContactList() {
+        //Clear list before adding items
+        list_contacts.getItems().clear();
+
+        for (Iterator<Contact> it = csvRepository.getAll(); it.hasNext(); ) {
+            Contact contact = it.next();
+            list_contacts.getItems().add(contact.getName());
+        }
+    }
+
+    /**
      * This method will be called when the window finishes it's initialisation.
      * @param event The window event invoking the method.
      */
@@ -83,11 +103,13 @@ public class ViewController implements EventHandler<WindowEvent> {
 
     @FXML
     public void onClicked_buttonNew() {
-        Contact contact = csvRepository.createModel();
-        contact.setId(csvRepository.getMaxId());
-        csvRepository.insert(contact);
+        Contact newContact = csvRepository.createModel();
+        newContact.setId(csvRepository.getMaxId() + 1);
 
-        applyContactToView(contact);
+        //Enable fields and apply data
+        changeFieldAccess(true);
+        applyContactToView(newContact);
+        this.shownContact = newContact;
     }
 
     @FXML
@@ -97,7 +119,23 @@ public class ViewController implements EventHandler<WindowEvent> {
 
     @FXML
     public void onClicked_buttonSave() {
+        //Store values from fields back into contact
+        shownContact.setName(field_name.getText());
+        shownContact.setPhoneNumber(field_phone.getText());
+        shownContact.setAddress(field_address.getText());
+
+        //Update if contact already exists in repository
+        if (csvRepository.getById(shownContact.getId()) != null) {
+            csvRepository.update(shownContact);
+        }
+        //Else insert the contact into the repository
+        else {
+            csvRepository.insert(shownContact);
+        }
+
+        //Write repository to csv file
         csvRepository.writeCSVFile(CSV_FILE_PATH);
+        updateContactList();
     }
 
     @FXML
