@@ -127,7 +127,17 @@ public class ViewController implements EventHandler<WindowEvent> {
 
     @FXML
     public void onClicked_buttonDelete() {
+        //Check if the entry is contained in the repository
+        if (shownContact != null && csvRepository.getById(shownContact.getId()) != null) {
+            csvRepository.delete(shownContact.getId());
+            updateContactList();
 
+            //Clear fields
+            field_id.clear();
+            field_name.clear();
+            field_phone.clear();
+            field_address.clear();
+        }
     }
 
     @FXML
@@ -149,10 +159,12 @@ public class ViewController implements EventHandler<WindowEvent> {
         //Write repository to csv file
         csvRepository.writeCSVFile(CSV_FILE_PATH);
         updateContactList();
+        changeFieldAccess(false);
     }
 
     @FXML
     public void onClicked_buttonCancel() {
-
+        changeFieldAccess(false);
+        applyContactToView(shownContact);
     }
 }
