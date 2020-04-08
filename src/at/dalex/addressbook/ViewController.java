@@ -2,11 +2,14 @@ package at.dalex.addressbook;
 
 import at.dalex.addressbook.repository.ContactCSVRepository;
 import at.dalex.addressbook.repository.model.Contact;
+import javafx.collections.ListChangeListener;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TextField;
+import javafx.scene.input.MouseEvent;
 import javafx.stage.WindowEvent;
 
 import java.util.Iterator;
@@ -89,6 +92,16 @@ public class ViewController implements EventHandler<WindowEvent> {
     @Override
     public void handle(WindowEvent event) {
         changeFieldAccess(false);
+
+        //Contact-List selection listener
+        list_contacts.getSelectionModel().getSelectedItems().addListener((ListChangeListener<String>) c ->
+        {
+            int selectedIndex = list_contacts.getSelectionModel().getSelectedIndex();
+            if (selectedIndex != -1) {
+                this.shownContact = csvRepository.getByIndex(selectedIndex);
+                applyContactToView(shownContact);
+            }
+        });
     }
 
     /* --- Button Listeners below --- */

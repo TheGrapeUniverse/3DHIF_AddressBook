@@ -10,6 +10,7 @@ public interface Repository<T> {
 
     Iterator<T> getAll();
     T getById(int id);
+    T getByIndex(int index);
     int getMaxId();
 
     T createModel();

@@ -90,6 +90,11 @@ class RepositoryBase<T extends IdentityObject> implements Repository<T>, AutoClo
     }
 
     @Override
+    public T getByIndex(int index) {
+        return modelEntries.get(index);
+    }
+
+    @Override
     public int getMaxId() {
         T maxEntry = modelEntries.stream()
                 .max(Comparator.comparing(IdentityObject::getId)).orElse(null);
