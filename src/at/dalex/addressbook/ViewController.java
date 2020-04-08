@@ -12,6 +12,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.WindowEvent;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 
 public class ViewController implements EventHandler<WindowEvent> {
@@ -32,7 +33,7 @@ public class ViewController implements EventHandler<WindowEvent> {
     @FXML private Button button_cancel;
 
     //ListView
-    @FXML private ListView<String> list_contacts;
+    @FXML private ListView<Contact> list_contacts;
 
     private ContactCSVRepository csvRepository;
     private Contact shownContact;
@@ -76,12 +77,14 @@ public class ViewController implements EventHandler<WindowEvent> {
      * in the repository.
      */
     private void updateContactList() {
-        //Clear list before adding items
+        String searchQuery = field_search.getText().trim().toLowerCase();
         list_contacts.getItems().clear();
 
         for (Iterator<Contact> it = csvRepository.getAll(); it.hasNext(); ) {
             Contact contact = it.next();
-            list_contacts.getItems().add(contact.getName());
+            if (contact.getName().toLowerCase().contains(searchQuery)) {
+                list_contacts.getItems().add(contact);
+            }
         }
     }
 
@@ -94,14 +97,15 @@ public class ViewController implements EventHandler<WindowEvent> {
         changeFieldAccess(false);
 
         //Contact-List selection listener
-        list_contacts.getSelectionModel().getSelectedItems().addListener((ListChangeListener<String>) c ->
+        list_contacts.getSelectionModel().getSelectedItems().addListener((ListChangeListener<Contact>) c ->
         {
-            int selectedIndex = list_contacts.getSelectionModel().getSelectedIndex();
-            if (selectedIndex != -1) {
-                this.shownContact = csvRepository.getByIndex(selectedIndex);
-                applyContactToView(shownContact);
-            }
+            this.shownContact = list_contacts.getSelectionModel().getSelectedItem();
+            applyContactToView(shownContact);
         });
+
+        //Load csv file
+        csvRepository.readCSVFile(CSV_FILE_PATH);
+        updateContactList();
     }
 
     /* --- Button Listeners below --- */
@@ -166,5 +170,10 @@ public class ViewController implements EventHandler<WindowEvent> {
     public void onClicked_buttonCancel() {
         changeFieldAccess(false);
         applyContactToView(shownContact);
+    }
+
+    @FXML
+    public void onClicked_buttonSearch() {
+        updateContactList();
     }
 }

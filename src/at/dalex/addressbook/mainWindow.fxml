@@ -61,7 +61,7 @@
       <HBox spacing="8.0" BorderPane.alignment="CENTER">
          <children>
             <TextField fx:id="field_search" prefWidth="248.0" />
-            <Button fx:id="button_search" mnemonicParsing="false" prefWidth="64.0" text="Search">
+            <Button fx:id="button_search" mnemonicParsing="false" onAction="#onClicked_buttonSearch" prefWidth="64.0" text="Search">
                <HBox.margin>
                   <Insets left="8.0" />
                </HBox.margin></Button>

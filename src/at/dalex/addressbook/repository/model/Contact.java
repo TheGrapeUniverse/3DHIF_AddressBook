@@ -31,4 +31,9 @@ public class Contact extends IdentityObject {
     public void setAddress(String address) {
         this.address = address;
     }
+
+    @Override
+    public String toString() {
+        return getName();
+    }
 }

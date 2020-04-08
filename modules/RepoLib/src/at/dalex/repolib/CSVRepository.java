@@ -16,7 +16,11 @@ public abstract class CSVRepository<T extends IdentityObject> extends Repository
     }
 
     public void readCSVFile(String csvPath) {
-        try (BufferedReader reader = new BufferedReader(new FileReader(new File(csvPath)))) {
+        File csvFile = new File(csvPath);
+        if (!csvFile.exists())
+            return;
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(csvFile))) {
             reader.readLine(); //Skip header
 
             String currentLine;
